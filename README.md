@@ -76,6 +76,16 @@ identically to your workflow.
     post-report: true
 ```
 
+Pro also accepts `username` + `password` instead of `api-token` (the action then
+obtains a JWT). When the Pro admin still has the default password
+(`must_change_password`), detection fails closed with an insecure-default error;
+set `refuse-insecure-default: false` only to downgrade it to a warning.
+
+**Viewing findings.** After the run, the severity table and any warnings appear
+in the workflow **step summary**; machine-readable results are exposed as action
+outputs (`critical`/`high`/…, `campaign-id`, `policy-failed`) and, with
+`report-format: sarif`, in the repository's **Security → Code scanning** tab.
+
 ### SARIF → GitHub code scanning
 
 Darkmoon has no native SARIF; the action synthesizes it from findings.
@@ -149,4 +159,4 @@ verifies it is up to date. Real E2E scenarios live in `scripts/e2e-run.sh`.
 
 ## License
 
-Apache-2.0. See [LICENSE](./LICENSE).
+MIT © 2026 ASC-IT (SARL) / Darkmoon. See [LICENSE](./LICENSE).

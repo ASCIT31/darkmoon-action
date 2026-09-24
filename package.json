@@ -1,10 +1,18 @@
 {
   "name": "darkmoon-action",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Official GitHub Action for Darkmoon autonomous AI penetration testing (OSS + Pro).",
-  "author": "ASC-IT",
-  "license": "Apache-2.0",
+  "author": "ASC-IT (SARL) — Darkmoon",
+  "license": "MIT",
+  "homepage": "https://github.com/ASCIT31/darkmoon-action#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ASCIT31/darkmoon-action.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ASCIT31/darkmoon-action/issues"
+  },
   "main": "dist/index.js",
   "engines": {
     "node": ">=20"
