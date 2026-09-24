@@ -28,14 +28,14 @@ rendering the exact output it writes.
 writes, rendered with GitHub-flavored-markdown styling. Aggregate counts only;
 no evidence, endpoints or tokens:
 
-![GitHub step summary](docs/screenshots/action-step-summary.png)
+![GitHub step summary](https://raw.githubusercontent.com/ASCIT31/darkmoon-action/master/docs/screenshots/action-step-summary.png)
 
 **Code scanning alerts (SARIF)** — with `report-format: sarif` the action
 synthesizes SARIF from the findings; uploaded via `github/codeql-action/upload-sarif`
 it appears under **Security → Code scanning**. Below is a representative render of
 the **real** generated `.sarif` (the live GitHub.com alerts UI needs a repository):
 
-![SARIF code scanning alerts](docs/screenshots/action-sarif-alerts.png)
+![SARIF code scanning alerts](https://raw.githubusercontent.com/ASCIT31/darkmoon-action/master/docs/screenshots/action-sarif-alerts.png)
 
 ## What it does
 
