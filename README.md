@@ -1,0 +1,152 @@
+# Darkmoon Pentest — GitHub Action
+
+Run [Darkmoon](https://dark-moon.org) autonomous AI penetration tests in your CI
+and **fail the build on findings by severity**. Works with both editions:
+
+- **Darkmoon OSS (Community)** — the local `opencode` engine + JSON store on a
+  self-hosted runner.
+- **Darkmoon Pro** — the REST API (SSE progress, dashboard, remediation).
+
+The action is a thin, safety-first wrapper over the frozen
+[`@darkmoon/client`](../darkmoon-client) contract, so both editions behave
+identically to your workflow.
+
+```yaml
+- uses: ASCIT31/darkmoon-action@v1
+  with:
+    target: http://127.0.0.1:3000
+    fail-on: critical,high
+```
+
+## What it does
+
+1. **Masks** your token / password with `core.setSecret()` **before first use**.
+2. **Detects** the edition (Pro via `GET /api/v1/system/info`, else OSS).
+3. **Launches** an assessment (or **attaches** to an existing campaign via
+   `campaign-id`).
+4. **Tracks** it to completion — SSE on Pro, polling on OSS. A run still not
+   terminal past `timeout-ms` is treated as **failure**, never a pass.
+5. **Fetches** the severity summary + findings + report.
+6. Writes a **severity table** to the job summary (`$GITHUB_STEP_SUMMARY`).
+7. **Fails the job from FINDINGS** (never from an exit code) per `fail-on`.
+
+## Safety & privacy (defaults)
+
+- **Nothing sensitive is printed.** Tokens, licenses, credentials and finding
+  evidence never reach the log. Secrets are masked; strings are scrubbed twice.
+- **Redaction-safe by default.** The report artifact is the client's *redacted*
+  body; the findings JSON has `evidence: null` and the backend `raw` object is
+  stripped. Un-redacted output is a deliberate two-key opt-in (`full-report`).
+- **Nothing is posted to shared surfaces unless you ask.** `post-report` is
+  `false` by default. When enabled, only **aggregate severity counts** are posted
+  to the PR/commit — never evidence, endpoints, or the report body.
+- **Findings-based verdict.** `fail-on` is evaluated from finding counts via the
+  client's `computeFailPolicy`; the OSS CLI exits `0` even with criticals, and the
+  action ignores exit codes entirely.
+
+## Usage
+
+### OSS (self-hosted runner co-located with Darkmoon)
+
+```yaml
+- uses: ASCIT31/darkmoon-action@v1
+  with:
+    mode: oss
+    oss-data-dir: /opt/darkmoon/darkmoon-settings   # host bind-mount with campaigns/ + vulnerabilities/
+    oss-reports-dir: /opt/darkmoon/reports
+    oss-launch-template: docker,exec,-T,opencode,opencode,run,--agent,pentest,--format,json,{PROMPT}
+    target: http://127.0.0.1:3000
+    focus: sqli,xss,idor
+    fail-on: critical,high
+```
+
+> Run **one Darkmoon container / compose-project per CI job**: OSS runs share one
+> data dir and the client correlates the new campaign by snapshot-diff.
+
+### Pro (REST API)
+
+```yaml
+- uses: ASCIT31/darkmoon-action@v1
+  with:
+    mode: pro
+    base-url: ${{ vars.DARKMOON_BASE_URL }}
+    api-token: ${{ secrets.DARKMOON_API_TOKEN }}
+    target: https://staging.example.com
+    fail-on: critical
+    post-report: true
+```
+
+### SARIF → GitHub code scanning
+
+Darkmoon has no native SARIF; the action synthesizes it from findings.
+
+```yaml
+- uses: ASCIT31/darkmoon-action@v1
+  id: dm
+  with: { target: http://127.0.0.1:3000, report-format: sarif }
+- uses: github/codeql-action/upload-sarif@v3
+  if: always()
+  with: { sarif_file: ${{ steps.dm.outputs.report-path }} }
+```
+
+### Attach to an existing campaign (gate without re-running)
+
+```yaml
+- uses: ASCIT31/darkmoon-action@v1
+  with:
+    mode: oss
+    oss-data-dir: /opt/darkmoon/darkmoon-settings
+    campaign-id: camp_20260728_9018be77
+    fail-on: critical,high
+```
+
+### Reusable workflow
+
+```yaml
+jobs:
+  security:
+    uses: ASCIT31/darkmoon-action/.github/workflows/darkmoon-reusable.yml@v1
+    with:
+      target: http://127.0.0.1:3000
+      fail-on: critical,high
+    secrets:
+      api-token: ${{ secrets.DARKMOON_API_TOKEN }}
+```
+
+## Inputs
+
+Transport: `mode` (`auto|oss|pro`), `base-url`, `api-token`, `username`,
+`password`, `refuse-insecure-default`, `oss-data-dir`, `oss-reports-dir`,
+`oss-script-path`, `oss-launch-template`.
+
+Scope (maps to the Darkmoon prompt DSL): `target`, `targets`, `program`,
+`focus`, `severity` (max cap), `exclude`, `out-of-scope`, `noise`, `format`,
+`safe-harbor`, `rules`.
+
+Policy & reporting: `fail-on`, `report-format` (`markdown|json|sarif`),
+`report-dir`, `full-report`, `post-report`, `github-token`, `campaign-id`,
+`poll-interval-ms`, `timeout-ms`.
+
+See [`action.yml`](./action.yml) for the full list and defaults.
+
+## Outputs
+
+`campaign-id`, `edition`, `overall-risk`, `total-findings`, `critical`, `high`,
+`medium`, `low`, `info`, `exploited`, `confirmed`, `unconfirmed`, `remediated`,
+`report-path`, `policy-failed`.
+
+## Development
+
+```bash
+npm ci
+npm run typecheck
+npm test          # unit + integration (mocked client)
+npm run build     # bundle to dist/index.js (esbuild)
+```
+
+The bundled `dist/index.js` is committed (GitHub Actions runs it directly). CI
+verifies it is up to date. Real E2E scenarios live in `scripts/e2e-run.sh`.
+
+## License
+
+Apache-2.0. See [LICENSE](./LICENSE).

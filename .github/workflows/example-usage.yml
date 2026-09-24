@@ -1,0 +1,56 @@
+name: Example — Darkmoon security gate
+
+# Example consumer workflow (copy into your own repo). Runs on a self-hosted
+# runner co-located with a Darkmoon deployment. Uses the composite action
+# directly; see darkmoon-reusable.yml for the reusable-workflow variant.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write      # required only when post-report: true
+
+jobs:
+  darkmoon-oss:
+    # A self-hosted runner where Darkmoon OSS runs via docker compose and its
+    # darkmoon-settings dir is bind-mounted to the host.
+    runs-on: [self-hosted, darkmoon]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Darkmoon autonomous pentest (OSS)
+        id: darkmoon
+        uses: ASCIT31/darkmoon-action@v1
+        with:
+          mode: oss
+          oss-data-dir: /opt/darkmoon/darkmoon-settings
+          oss-reports-dir: /opt/darkmoon/reports
+          oss-launch-template: docker,exec,-T,opencode,opencode,run,--agent,pentest,--format,json,{PROMPT}
+          target: http://127.0.0.1:3000
+          program: "Juice Shop"
+          focus: sqli,xss,idor,auth-bypass
+          exclude: dom-xss,self-xss,clickjacking
+          noise: moderate
+          fail-on: critical,high         # blocking gate
+          report-format: sarif
+
+      - name: Upload SARIF to code scanning
+        if: ${{ always() && steps.darkmoon.outputs.report-path != '' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.darkmoon.outputs.report-path }}
+
+  darkmoon-pro:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Darkmoon assessment (Pro REST)
+        uses: ASCIT31/darkmoon-action@v1
+        with:
+          mode: pro
+          base-url: ${{ vars.DARKMOON_BASE_URL }}
+          api-token: ${{ secrets.DARKMOON_API_TOKEN }}
+          target: https://staging.example.com
+          fail-on: critical              # blocking on critical only
+          post-report: true              # posts a redaction-safe summary to the PR
