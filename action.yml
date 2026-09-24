@@ -1,5 +1,5 @@
 name: 'Darkmoon Pentest'
-description: 'Autonomous AI penetration testing in CI. Works with Darkmoon OSS (local CLI) and Pro (REST API). Fails builds on findings by severity.'
+description: 'Autonomous AI penetration testing in CI. Works with Darkmoon OSS and Pro. Fails builds on findings by severity.'
 author: 'ASC-IT'
 
 branding:
