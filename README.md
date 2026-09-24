@@ -8,7 +8,7 @@ and **fail the build on findings by severity**. Works with both editions:
 - **Darkmoon Pro** — the REST API (SSE progress, dashboard, remediation).
 
 The action is a thin, safety-first wrapper over the frozen
-[`@darkmoon/client`](../darkmoon-client) contract, so both editions behave
+[`@darkmoon_ai/client`](../darkmoon-client) contract, so both editions behave
 identically to your workflow.
 
 ```yaml

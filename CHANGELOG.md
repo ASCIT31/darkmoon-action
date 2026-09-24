@@ -21,7 +21,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Licensed under MIT.
 
 ### Security
-- The executed bundle (`dist/index.js`) and the vendored `@darkmoon/client`
+- The executed bundle (`dist/index.js`) and the vendored `@darkmoon_ai/client`
   tarball contain no lab/demo data. Real Juice Shop fixtures live only in the
   dev-time `src/__tests__` / `test-fixtures` / `e2e` trees, which are not part of
   the action's runtime surface.
