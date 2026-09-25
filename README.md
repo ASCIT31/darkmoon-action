@@ -1,5 +1,7 @@
 # Darkmoon Pentest — GitHub Action
 
+> **📦 Marketplace status:** GitHub Marketplace listing **pending publication**. Usable right now via `uses: ASCIT31/darkmoon-action@v0.1.0`.
+
 
 ## ⭐ Darkmoon ecosystem
 
