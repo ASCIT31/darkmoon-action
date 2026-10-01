@@ -182,3 +182,18 @@ verifies it is up to date. Real E2E scenarios live in `scripts/e2e-run.sh`.
 ## License
 
 MIT © 2026 ASC-IT (SARL) / Darkmoon. See [LICENSE](./LICENSE).
+
+## 🎥 Video tutorial
+
+[![Watch the Darkmoon + GitHub Actions tutorial on YouTube](https://img.youtube.com/vi/e67klNk79vg/maxresdefault.jpg)](https://youtu.be/e67klNk79vg)
+
+▶ **[Watch the full Darkmoon + GitHub Actions tutorial on YouTube](https://youtu.be/e67klNk79vg)** — real setup, end to end.
+
+## Darkmoon ecosystem
+
+Darkmoon is an open-source, AI-powered penetration testing platform. It runs a full autonomous assessment and this integration brings the results into your GitHub Actions workflow.
+
+- ⭐ **Flagship (star it):** https://github.com/ASCIT31/Dark-Moon
+- 📚 **Docs:** https://docs.dark-moon.org
+- 🌐 **Website:** https://dark-moon.org
+- 🔗 **Related integrations:** [GitLab CI/CD](https://github.com/ASCIT31/darkmoon-gitlab) · [Jenkins](https://github.com/ASCIT31/darkmoon-jenkins) 
